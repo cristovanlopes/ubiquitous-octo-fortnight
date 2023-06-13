@@ -1,0 +1,312 @@
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="user-scalable=0.25">
+    <title>Dashboard Grafico</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script>
+
+google.charts.load('current', {packages: ['corechart']});
+
+
+
+var allData2023 ={{allData}};
+var allData2022 ={{allData2}};
+
+
+   var chartColors = [
+        '#3374dc',
+        '#ffbd15',
+        '#067237',
+        '#25549b',
+        '#e37b11',
+        '#b7ecec',
+        '#8c8989',
+        '#cde05b',
+        '#e7b4b4',
+    ];
+
+
+function drawCharts(dataSet, idSuffix) {
+    var columnTitles = [
+        'FAT($)',
+        'RENT($)',
+        'RENT(%)',
+        'VEND QUAN',
+        'ENTR QUAN',
+        'ESTQ($)',
+        'RUP COMPRA($)',
+        'SKU EST',
+        'SKU-VEND',
+    ];
+
+    for (var i = 1; i <= columnTitles.length; i++) {
+        drawIndividualChart(i, columnTitles[i - 1], dataSet, idSuffix);
+    }
+}
+
+function drawIndividualChart(chartIndex, columnTitle, dataSet, idSuffix) {
+    var data = google.visualization.arrayToDataTable([
+        ['Month', columnTitle],
+        ['Janeiro', dataSet[0][chartIndex - 1]],
+        ['Fevereiro', dataSet[1][chartIndex - 1]],
+        ['Março', dataSet[2][chartIndex - 1]],
+        ['Abril', dataSet[3][chartIndex - 1]],
+        ['Maio', dataSet[4][chartIndex - 1]],
+        ['Junho', dataSet[5][chartIndex - 1]],
+        ['Julho', dataSet[6][chartIndex - 1]],
+        ['Agosto', dataSet[7][chartIndex - 1]],
+        ['Setembro', dataSet[8][chartIndex - 1]],
+        ['Outubro', dataSet[9][chartIndex - 1]],
+        ['Novembro', dataSet[10][chartIndex - 1]],
+        ['Dezembro', dataSet[11][chartIndex - 1]],
+    ]);
+
+    var view = new google.visualization.DataView(data);
+    view.setColumns([
+        0,
+        1,
+        {
+            calc: function (dt, rowIndex) {
+                return dt.getFormattedValue(rowIndex, 1);
+            },
+            type: 'string',
+            role: 'annotation',
+        },
+    ]);
+
+
+
+
+    var options = {
+        curveType: 'function',
+        colors: [chartColors[chartIndex % chartColors.length]],
+        pointSize: 10,
+        vAxis: {
+            textPosition: 'none',
+            gridlines: {
+                color: 'transparent'  // adicione esta linha para remover as linhas de grade verticais
+            }
+        },
+        hAxis: {
+            textStyle: {
+                color: '#FFFFFF',
+                fontName: 'Arial',
+                fontSize: 16,
+                fontWeight: 'normal'
+            },
+            gridlines: {
+                color: 'transparent'  // adicione esta linha para remover as linhas de grade horizontais
+            }
+        },
+        backgroundColor: '#383838',
+        legend: {position: 'none'},
+    };
+    var chart = new google.visualization.LineChart(
+        document.getElementById('chart' + chartIndex + idSuffix)
+    );
+    chart.draw(view, options);
+}
+function createLegend(dataSet, id) {
+    var legendDiv = document.getElementById(id);
+    var columnTitles = [
+        'FAT($)',
+        'RENT($)',
+        'RENT(%)',
+        'VEND QUAN',
+        'ENTR QUAN',
+        'ESTQ($)',
+        'RUP COMPRA($)',
+        'SKU EST',
+        'SKU-VEND',
+    ];
+     var legendHtml = '<ul style="display: flex; flex-wrap: wrap; padding: 0;">';
+    for (var i = 0; i < columnTitles.length; i++) {
+        legendHtml += '<li style="list-style-type: none; margin-right: 20px;"><span style="color:' + chartColors[i % chartColors.length] +
+            '">&#9679;</span> ' + columnTitles[i] + '</li>';
+    }
+    legendHtml += '</ul>';
+    legendDiv.innerHTML = legendHtml;
+}
+
+// Chamar a função quando os gráficos são desenhados
+google.charts.setOnLoadCallback(function () {
+    drawCharts(allData2023, '2023'); // Dados de 2023
+    drawCharts(allData2022, '2022'); // Dados de 2022
+    createLegend(allData2023, 'legend2023'); // Cria a legenda para 2023
+});
+
+var dropdown = document.querySelector('.dropdown-button');
+dropdown.onclick = function() {
+    document.getElementById("myDropdown").classList.toggle("show");
+}
+
+window.onclick = function(event) {
+    if (!event.target.matches('.dropdown-button')) {
+        var dropdowns = document.getElementsByClassName("dropdown-content");
+        for (var i = 0; i < dropdowns.length; i++) {
+            var openDropdown = dropdowns[i];
+            if (openDropdown.classList.contains('show')) {
+                openDropdown.classList.remove('show');
+            }
+        }
+    }
+}
+
+
+    </script>
+
+</head>
+<body>
+<div class="direita">
+
+         <div class="laranja">
+            <div class="slogan">
+                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo">
+            </div>
+         </div>
+        <div class="menu-central">
+        <select id="mySelect">
+        <option value="/faturamento">Faturamento</option>
+        <option value="/analisecomercial">Análise Comercial</option>
+        <option value="/metarealizado">Metas Realizadas</option>
+        </select>
+
+        <button onclick="myFunction()">Go to page</button>
+
+        <script>
+        function myFunction() {
+        var x = document.getElementById("mySelect").value;
+        window.location.href = x;
+        }
+        </script>
+
+    </div>
+    <div class="coluna-charts">
+        <div class="azul-chart1">
+            <div class="ano1vertical">2023</div>
+
+
+            <div class="charts1" id="chartContainer">
+                <div id="title-top">ANALISE COMERCIAL - (Goiânia) geral (LOJAS)</div>
+                <div id="legend2023"></div>
+                <div id="chart12023" class="chart-div-top"></div>
+                <div id="chart22023" class="chart-div"></div>
+                <div id="chart32023" class="chart-div"></div>
+                <div id="chart42023" class="chart-div"></div>
+                <div id="chart52023" class="chart-div"></div>
+                <div id="chart62023" class="chart-div"></div>
+                <div id="chart72023" class="chart-div"></div>
+                <div id="chart82023" class="chart-div"></div>
+                <div id="chart92023" class="chart-div"></div>
+                 <div id="table-container1" class="table-container">
+                    <div id="table1" class="table-first">
+                        <div>
+                            <table>
+                                <tr class="row-1">
+                                    <td>VENDAS</td>
+                                    <td>{{ vendas }}</td>
+                                    <td>ENTRADAS</td>                                    
+                                    <td>{{ entradas }}</td>
+                                    <td>{{ percentual }}</td>
+                                </tr>
+                                <tr class="row-2">
+                                    <td>EVOLUÇÃO</td>
+                                    <td>FAT</td>
+                                    <td>{{ evolucao.fat }}</td>
+                                    <td>RENT</td>
+                                    <td>{{ evolucao.rent }}</td>
+                                </tr>
+                            </table>
+                        </div>
+
+                    </div>
+                    <div id="table-soma1" class="table-soma">
+                        <div>
+                            <table>
+                            <tr>
+                                <td>SOMA</td>
+                                <td>{{ soma.soma }}</td>
+                                <td>MEDIA</td>
+                                <td>{{ soma.media1 }}</td>
+                                <td>{{ soma.media2 }}</td>
+                                <td>{{ soma.percentual }}</td>
+                                <td>{{ soma.valor1 }}</td>
+                                <td>{{ soma.valor2 }}</td>
+                                <td>{{ soma.valor3 }}</td>
+                                <td>{{ soma.valor4 }}</td>
+                                <td>{{ soma.valor5 }}</td>
+                            </tr>
+                            </table>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="azul-chart2">
+            <div class="ano2vertical">2022</div>
+            <div class="charts2" id="charts2022">
+                <div id="chart12022" class="chart-div-top"></div>
+                <div id="chart22022" class="chart-div"></div>
+                <div id="chart32022" class="chart-div"></div>
+                <div id="chart42022" class="chart-div"></div>
+                <div id="chart52022" class="chart-div"></div>
+                <div id="chart62022" class="chart-div"></div>
+                <div id="chart72022" class="chart-div"></div>
+                <div id="chart82022" class="chart-div"></div>
+                <div id="chart92022" class="chart-div-last"></div>
+
+                <div id="table-container2" class="table-container">
+                    <div id="table2" class="table-first">
+                        <div>
+                            <table>
+                                <tr class="row-1">
+                                    <td>VENDAS</td>
+                                    <td>{{ vendas2 }}</td>
+                                    <td>ENTRADAS</td>
+                                    <td>{{ entradas2 }}</td>
+                                    <td>{{ percentual2 }}</td>
+                                </tr>
+                                <tr class="row-2">
+                                    <td>EVOLUÇÃO</td>
+                                    <td>FAT</td>
+                                    <td>{{ evolucao2.fat }}</td>
+                                    <td>RENT</td>
+                                    <td>{{ evolucao2.rent }}</td>
+                                </tr>
+                                
+                            </table>
+                        </div>
+
+                    </div>
+                    <div id="table-soma2" class="table-soma">
+                        <div>
+                            <table>
+                                    <tr>
+                                        <td>SOMA</td>
+                                        <td>{{ soma2.soma }}</td>
+                                        <td>MEDIA</td>
+                                        <td>{{ soma2.media1 }}</td>
+                                        <td>{{ soma2.media2 }}</td>
+                                        <td>{{ soma2.percentual }}</td>
+                                        <td>{{ soma2.valor1 }}</td>
+                                        <td>{{ soma2.valor2 }}</td>
+                                        <td>{{ soma2.valor3 }}</td>
+                                        <td>{{ soma2.valor4 }}</td>
+                                        <td>{{ soma2.valor5 }}</td>
+                                    </tr>
+                                </table>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+</body>
+</html>
